@@ -9,20 +9,21 @@ export const animate: AnimateFunction = ({
   onFinish,
 }) => {
   const totalTicks = lifetime;
-  let tick = 0;
+  let startTime: number | null = null;
 
-  const update = () => {
-    particles.forEach((particle) =>
-      updateParticle(particle, tick / totalTicks, decay)
-    );
+  const update = (timestamp: number) => {
+    if (!startTime) startTime = timestamp;
 
-    tick += 1;
-    if (tick < totalTicks) {
+    const elapsed = timestamp - startTime;
+    const progress = Math.min(elapsed / (totalTicks * (1000 / 60)), 1); // Normalize to 60 FPS base
+    particles.forEach((particle) => updateParticle(particle, progress, decay));
+
+    if (progress < 1) {
       window.requestAnimationFrame(update);
     } else {
       particles.forEach((particle) => {
         if (particle.element.parentNode === root) {
-          return root.removeChild(particle.element);
+          root.removeChild(particle.element);
         }
       });
       onFinish();

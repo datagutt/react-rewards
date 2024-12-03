@@ -1,4 +1,4 @@
-import { AnimateFunction } from './helpers.types';
+import { AnimateFunction } from "./helpers.types";
 
 export const animate: AnimateFunction = ({
   root,
@@ -8,16 +8,24 @@ export const animate: AnimateFunction = ({
   updateParticle,
   onFinish,
 }) => {
-  const totalTicks = lifetime;
   let startTime: number | null = null;
 
   const update = (timestamp: number) => {
-    if (!startTime) startTime = timestamp;
+    if (!startTime) {
+      startTime = timestamp;
+    }
 
+    // Calculate progress normalized to 60 FPS ticks
     const elapsed = timestamp - startTime;
-    const progress = Math.min(elapsed / (totalTicks * (1000 / 60)), 1); // Normalize to 60 FPS base
-    particles.forEach((particle) => updateParticle(particle, progress, decay));
+    const normalizedProgress = elapsed / ((1000 / 60) * lifetime);
+    const progress = Math.min(normalizedProgress, 1);
 
+    // Update each particle based on progress
+    particles.forEach((particle) => {
+      updateParticle(particle, progress, decay);
+    });
+
+    // Continue or finish the animation
     if (progress < 1) {
       window.requestAnimationFrame(update);
     } else {

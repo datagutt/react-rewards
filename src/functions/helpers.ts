@@ -11,24 +11,20 @@ export const animate: AnimateFunction = ({
   let startTime: number | null = null;
 
   const update = (timestamp: number) => {
-    if (!startTime) {
-      startTime = timestamp;
-    }
+    if (!startTime) startTime = timestamp;
 
-    // Calculate progress normalized to 60 FPS ticks
+    // Calculate the progress based on elapsed time
     const elapsed = timestamp - startTime;
-    const normalizedProgress = elapsed / ((1000 / 60) * lifetime);
-    const progress = Math.min(normalizedProgress, 1);
+    const progress = Math.min(elapsed / lifetime, 1); // Normalize progress to [0, 1]
 
     // Update each particle based on progress
-    particles.forEach((particle) => {
-      updateParticle(particle, progress, decay);
-    });
+    particles.forEach((particle) => updateParticle(particle, progress, decay));
 
-    // Continue or finish the animation
+    // Continue animation if progress is less than 1
     if (progress < 1) {
       window.requestAnimationFrame(update);
     } else {
+      // Cleanup particles after animation is complete
       particles.forEach((particle) => {
         if (particle.element.parentNode === root) {
           root.removeChild(particle.element);

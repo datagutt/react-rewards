@@ -1,4 +1,4 @@
-import { AnimateFunction } from "./helpers.types";
+import { AnimateFunction } from './helpers.types';
 
 export const animate: AnimateFunction = ({
   root,
